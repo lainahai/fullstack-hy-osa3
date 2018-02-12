@@ -33,6 +33,10 @@ app.get('/info', (request, response) => {
       response.send(`<p>Puhelinluettelossa ${persons.length} henkilön tiedot</p>\n
                      <p>${today.toString()}</p>`)
   })
+    .catch(error => {
+      console.log(error)
+      // ...
+  })
 })
 
 app.get('/api/persons', (request, response) => {
@@ -40,22 +44,37 @@ app.get('/api/persons', (request, response) => {
     .then(persons => {
       response.json(persons.map(formatPerson))
   })
+    .catch(error => {
+      console.log(error)
+      // ...
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
   Person
     .findById(request.params.id)
       .then(person => {
-        response.json(formatPerson(person))
-  })
+        if (person){
+          response.json(formatPerson(person))
+        } else {
+          response.status(404).end()
+        }
+    })
+      .catch(error => {
+        console.log(error)
+        response.status(400).send({ error: 'malformatted id' })
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  //console.log("Deleting person with id", id)
-  persons = persons.filter(person => person.id != id)
-
-  response.status(204).end()
+  Person
+    .findByIdAndRemove(request.params.id)
+      .then(result => {
+        response.status(204).end()
+      })
+      .catch(error => {
+        response.status(400).send({ error: 'malformatted id' })
+      })
 })
 
 const generateId = () => {
@@ -83,6 +102,10 @@ app.post('/api/persons', (request, response) => {
     .save()
       .then(result => {
         response.json(formatPerson(result))
+      })
+      .catch(error => {
+        console.log(error)
+        // ...
       })
   })
 
