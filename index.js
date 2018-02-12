@@ -1,7 +1,15 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const morgan = require("morgan")
 
+
+
+morgan.token("body-content", (req, res) => {
+  return JSON.stringify(req.body)
+})
+
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body-content"))
 app.use(bodyParser.json())
 
 const generateId = () => {
@@ -55,7 +63,7 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
-  console.log("Deleting person with id", id)
+  //console.log("Deleting person with id", id)
   persons = persons.filter(person => person.id != id)
 
   response.status(204).end()
@@ -81,7 +89,7 @@ app.post('/api/persons', (request, response) => {
 
   newPerson.id = id
 
-  console.log("Added new person ", newPerson)
+  //console.log("Added new person ", newPerson)
 
   persons = persons.concat(newPerson)
   response.json(newPerson)
