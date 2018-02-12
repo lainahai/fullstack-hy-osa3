@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
 
-const getId = () => {
+const generateId = () => {
   return Math.floor(Math.random() * 10000 + 1)
 }
 
@@ -62,19 +62,29 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-  const person = request.body
+  const newPerson = request.body
 
-  let id = getId()
+  if (newPerson.name === undefined ){
+    return response.status(400).json("Error: name missing")
+  }
+  if (newPerson.number === undefined ){
+    return response.status(400).json("Error: number missing")
+  }
+  if (persons.find(person => person.name === newPerson.name)){
+    return response.status(400).json("Error: name must be unique")
+  } 
+
+  let id = generateId()
   while(persons.find(person => person.id === id)){
-    id = getId()
+    id = generateId()
   }
 
-  person.id = id
+  newPerson.id = id
 
-  console.log("Added new person ", person)
+  console.log("Added new person ", newPerson)
 
-  persons = persons.concat(person)
-  response.json(person)
+  persons = persons.concat(newPerson)
+  response.json(newPerson)
 })
 
 
