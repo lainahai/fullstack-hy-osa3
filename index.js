@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const morgan = require("morgan")
+const cors = require('cors')
+
 
 
 
@@ -9,8 +11,10 @@ morgan.token("body-content", (req, res) => {
   return JSON.stringify(req.body)
 })
 
-app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body-content"))
 app.use(bodyParser.json())
+app.use(cors())
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body-content"))
+app.use(express.static('build'))
 
 const generateId = () => {
   return Math.floor(Math.random() * 10000 + 1)
