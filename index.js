@@ -71,22 +71,20 @@ app.post('/api/persons', (request, response) => {
   if (newPerson.number === undefined ){
     return response.status(400).json("Error: number missing")
   }
+  /*
   if (persons.find(person => person.name === newPerson.name)){
     return response.status(400).json("Error: name must be unique")
   } 
+§ */
 
-  let id = generateId()
-  while(persons.find(person => person.id === id)){
-    id = generateId()
-  }
-
-  newPerson.id = id
-
-  //console.log("Added new person ", newPerson)
-
-  persons = persons.concat(newPerson)
-  response.json(newPerson)
-})
+  const person = new Person(newPerson)
+  
+  person
+    .save()
+      .then(result => {
+        response.json(formatPerson(result))
+      })
+  })
 
 
 const PORT = process.env.PORT || 3001
