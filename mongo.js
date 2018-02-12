@@ -7,14 +7,10 @@ const config = require('./secrets')
 const url = `mongodb://${config.user}:${config.pass}@ds133558.mlab.com:33558/fullstackpuhelin`
 mongoose.connect(url)
 
-const generateId = () => {
-  return Math.floor(Math.random() * 10000 + 1)
-}
 
 const Person = mongoose.model('Person', {
   name: String,
-  number: String,
-  id: Number
+  number: String
 })
 
 const name = process.argv[2]
@@ -23,8 +19,7 @@ const number = process.argv[3]
 if (name && number){
   const person = new Person({
     name: name,
-    number: number,
-    id: generateId()
+    number: number
   })
 
   person

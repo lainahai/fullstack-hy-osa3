@@ -3,7 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan = require("morgan")
 const cors = require('cors')
-
+const Person = require('./models/person')
 
 
 
@@ -16,49 +16,38 @@ app.use(cors())
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body-content"))
 app.use(express.static('build'))
 
-let persons = [
-    {
-      "name": "Arto Hellas",
-      "number": "040-123456",
-      "id": 1
-    },
-    {
-      "name": "Martti Tienari",
-      "number": "040-123456",
-      "id": 2
-    },
-    {
-      "name": "Arto Järvinen",
-      "number": "040-123456",
-      "id": 3
-    },
-    {
-      "name": "Lea Kutvonen",
-      "number": "040-123456",
-      "id": 4
-    }
-  ]
+
+
+const formatPerson = (person) => {
+  return {
+    name: person.name,
+    number: person.number,
+    id: person._id
+  }
+}
 
 app.get('/info', (request, response) => {
   const today = new Date()
-  response.send(`<p>Puhelinluettelossa ${persons.length} henkilön tiedot</p>\n
-            <p>${today.toString()}</p>`)
+  Person.find({})
+    .then(persons => {
+      response.send(`<p>Puhelinluettelossa ${persons.length} henkilön tiedot</p>\n
+                     <p>${today.toString()}</p>`)
+  })
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person.find({})
+    .then(persons => {
+      response.json(persons.map(formatPerson))
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  
-  const person = persons.find(person => person.id === id)
-
-  if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
+  Person
+    .findById(request.params.id)
+      .then(person => {
+        response.json(formatPerson(person))
+  })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
